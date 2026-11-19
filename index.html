@@ -32,7 +32,7 @@ body{
 }
 
 /* ---------- scena ---------- */
-.cornice{width:100%;max-width:calc(100vh * 16 / 9);overflow:hidden;position:relative}
+.cornice{width:100%;max-width:calc(100svh * 16 / 9);overflow:hidden;position:relative;flex:none}
 .scena{position:relative;width:100%;aspect-ratio:1920/1080;transition:filter .8s}
 .scena > img{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none}
 /* luna piena (accendendo la luna lo spicchio diventa tondo) */
@@ -204,6 +204,10 @@ body{
 .chiudi-ist svg{width:100%;height:100%;display:block}
 .btn.attivo{background:var(--oro);color:var(--inchiostro);border-color:var(--oro)}
 .solo-mobile{display:none}
+.ruota{display:none;align-items:center;gap:10px;margin:14px auto 0;padding:8px 16px 8px 10px;border-radius:999px;
+  color:#c9ceff;background:rgba(201,198,245,.08);border:1px solid rgba(201,198,245,.25);font:500 14px 'Jost',sans-serif}
+.ruota svg{width:28px;height:28px;flex:none;animation:gira 3.2s ease-in-out infinite}
+@keyframes gira{0%,35%{transform:rotate(0)}55%,85%{transform:rotate(-90deg)}100%{transform:rotate(0)}}
 
 /* ---------- biglietto (design: cornice con neve, numero giallo, locandina, titolo) ---------- */
 .velo{position:fixed;inset:0;background:rgba(8,6,30,.72);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
@@ -263,13 +267,11 @@ body{
 
 /* ---------- mobile: si inquadra il villaggio ---------- */
 @media (max-width:700px) and (orientation:portrait){
-  /* il villaggio riempie lo schermo in altezza e si scorre di lato con il dito */
-  .cornice{max-width:none;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain}
-  .cornice::-webkit-scrollbar{display:none}
-  /* altezza visibile; l'immagine è più alta del 17% e la striscia in basso (icone e BONUS disegnati) resta nascosta */
-  .cornice{--v:max(calc(100svh - 190px - env(safe-area-inset-top) - env(safe-area-inset-bottom)), 105vw);height:var(--v)}
-  .scena{width:calc(var(--v) / .855 * 1920 / 1080)}
-  .casella{width:4.6%}
+  /* tutto il villaggio nella larghezza dello schermo: si mostra solo la zona delle case (x 410–1700, y 0–925) */
+  .cornice{max-width:none;overflow:hidden;height:calc(100vw * 1920 / 1290 * 925 / 1920)}
+  .scena{width:calc(100vw * 1920 / 1290);margin-left:calc(100vw * -410 / 1290)}
+  .casella{width:6%}
+  .ruota{display:flex}
   .icona,.bonus{display:none}
   .solo-mobile{display:inline-block}
   .ico-btn{display:inline-block}
@@ -301,6 +303,10 @@ body{
   </div>
 </div>
 
+<div class="ruota" aria-hidden="true">
+  <svg viewBox="0 0 48 48"><rect x="15" y="6" width="18" height="30" rx="4" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M8 30a18 18 0 0 0 14 14m-4 0h4v-4M40 18A18 18 0 0 0 26 4m4 0h-4v4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <span>Ruota il telefono per vederlo più grande</span>
+</div>
 <div class="barra">
   <button class="ico-btn" data-tipo="neve" aria-label="Neve" aria-pressed="false"></button>
   <button class="ico-btn" data-tipo="luci" aria-label="Luci" aria-pressed="false"></button>
@@ -625,14 +631,7 @@ function toast(m){ const t = $('toast'); t.textContent = m; t.classList.add('vis
 
 disegna(); applica();
 
-// telefono in verticale: centra il villaggio (o la casa del giorno) e suggerisce di scorrere
-(function(){
-  const c = document.querySelector('.cornice');
-  if (!matchMedia('(max-width:700px) and (orientation:portrait)').matches || c.scrollWidth <= c.clientWidth) return;
-  const n = giornoOggi(), x = (n && POS[n] ? POS[n][0] : 1030) / 1920;
-  c.scrollLeft = x * c.scrollWidth - c.clientWidth / 2;
-  if (!mem.get('scorri', false)){ setTimeout(() => toast('Scorri di lato per vedere tutto il villaggio 👈👉'), 900); mem.set('scorri', true) }
-})();
+
 
 // ---------- pulsante "Installa l'app" ----------
 (function(){
