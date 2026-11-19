@@ -1,5 +1,5 @@
 // Funzionamento offline + aggiornamenti sicuri
-const CACHE = 'avvento-v13';
+const CACHE = 'avvento-v14';
 const FILES = [
  "./",
  "apple-touch-icon.png",

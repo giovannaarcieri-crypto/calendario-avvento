@@ -277,20 +277,18 @@ body{
   .ruota{display:flex;margin:16px auto 4px;padding:0;border:none;background:none;font-size:14px;color:#c9ceff;gap:8px}
   .ruota svg{width:24px;height:24px}
 }
-@media (prefers-reduced-motion:reduce){
-  .casella .bollino{transition:none}.fiocco,.casella.oggi .bollino,.sbuffo{animation:none}
-  .finestre.oggi{animation:none;-webkit-mask-image:none;mask-image:none}.casella.oggi .bollino{opacity:1;transform:none}
-  .scena.luci-on .ghirlanda.a{animation:none;opacity:1}.scena.luci-on .ghirlanda.b{animation:none}
-}
+
 
 @keyframes lampA{0%,44%{fill:#ffe94f;filter:drop-shadow(0 0 5px #ffd84a)}50%,94%{fill:#5560ab;filter:none}100%{fill:#ffe94f;filter:drop-shadow(0 0 5px #ffd84a)}}
 @keyframes lampB{0%,44%{fill:#5560ab;filter:none}50%,94%{fill:#ffe94f;filter:drop-shadow(0 0 5px #ffd84a)}100%{fill:#5560ab;filter:none}}
 
 /* ---------- telefono in orizzontale: riempie lo schermo (si sacrifica un po' di cielo in alto) ---------- */
 @media (orientation:landscape) and (max-height:500px){
-  body{justify-content:flex-start;padding-top:0}
-  .cornice{height:100svh;max-width:calc(100svh / .88 * 16 / 9)}
-  .scena{margin-top:calc(100svh - 100svh / .88)}
+  /* telefono ruotato: immagine intera e centrata (come su desktop), niente tagli */
+  body{justify-content:center;padding:0;min-height:100svh}
+  .cornice{height:auto;max-width:calc(100svh * 16 / 9);margin:auto 0}
+  .scena{margin-top:0}
+  .barra,.ruota{display:none!important}   /* ruotato: solo l'immagine */
 }
 
 /* ---------- touch: niente effetto "passaggio del mouse" che resta attaccato ---------- */
