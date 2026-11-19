@@ -204,6 +204,8 @@ body{
 .chiudi-ist svg{width:100%;height:100%;display:block}
 .btn.attivo{background:var(--oro);color:var(--inchiostro);border-color:var(--oro)}
 .solo-mobile{display:none}
+.cielo{display:none}
+.neve-giu{display:contents}
 .ruota{display:none;align-items:center;gap:10px;margin:14px auto 0;padding:8px 16px 8px 10px;border-radius:999px;
   color:#c9ceff;background:rgba(201,198,245,.08);border:1px solid rgba(201,198,245,.25);font:500 14px 'Jost',sans-serif}
 .ruota svg{width:28px;height:28px;flex:none;animation:gira 3.2s ease-in-out infinite}
@@ -271,7 +273,19 @@ body{
   .cornice{max-width:none;overflow:hidden;height:calc(100vw * 1920 / 1290 * 925 / 1920)}
   .scena{width:calc(100vw * 1920 / 1290);margin-left:calc(100vw * -410 / 1290)}
   .casella{width:6%}
-  .ruota{display:flex}
+  /* tutto lo schermo è il villaggio: cielo sopra, neve sotto */
+  html,body{background:#191b43}
+  body{justify-content:flex-start;min-height:100svh}
+  .cielo{display:block;flex:1 1 0;min-height:24px;width:100%;
+    background:radial-gradient(1.5px 1.5px at 18% 30%,#fff9 50%,transparent 51%),radial-gradient(1.5px 1.5px at 72% 55%,#fff8 50%,transparent 51%),
+      radial-gradient(2px 2px at 45% 75%,#fffa 50%,transparent 51%),radial-gradient(1.5px 1.5px at 88% 20%,#fff7 50%,transparent 51%),#191b43}
+  .cornice{-webkit-mask-image:linear-gradient(#0000,#000 7%);mask-image:linear-gradient(#0000,#000 7%)}
+  .neve-giu{display:flex;flex-direction:column;align-items:center;flex:1.6 1 0;width:100%;position:relative;z-index:2;
+    margin-top:-34px;padding:34px 0 calc(16px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg,#323f6200 0,#323f62 34px,#2c3759 45%,#222a4c 100%)}
+  .neve-giu .barra{padding:6px 12px 0}
+  .ruota{display:flex;margin:4px auto 10px;padding:0;border:none;background:none;font-size:13px;color:#b3b9ee;opacity:.85;gap:6px}
+  .ruota svg{width:20px;height:20px}
   .icona,.bonus{display:none}
   .solo-mobile{display:inline-block}
   .ico-btn{display:inline-block}
@@ -285,6 +299,7 @@ body{
 </head>
 <body>
 
+<div class="cielo" aria-hidden="true"></div>
 <div class="cornice">
   <div class="scena" id="scena">
     <img src="sfondo.jpg" alt="Villaggio innevato di notte con 24 casette numerate">
@@ -303,9 +318,10 @@ body{
   </div>
 </div>
 
+<div class="neve-giu">
 <div class="ruota" aria-hidden="true">
   <svg viewBox="0 0 48 48"><rect x="15" y="6" width="18" height="30" rx="4" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M8 30a18 18 0 0 0 14 14m-4 0h4v-4M40 18A18 18 0 0 0 26 4m4 0h-4v4" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  <span>Ruota il telefono per vederlo più grande</span>
+  <span>Ruota il telefono per ingrandire</span>
 </div>
 <div class="barra">
   <button class="ico-btn" data-tipo="neve" aria-label="Neve" aria-pressed="false"></button>
@@ -320,6 +336,7 @@ body{
   <!-- versione da condividere: niente pulsanti di prova -->
   <button class="btn" id="btnAnteprima" hidden></button>
   <button class="btn" id="btnReset" hidden></button>
+</div>
 </div>
 
 <div class="velo" id="velo" role="dialog" aria-modal="true" aria-labelledby="titoloB">
