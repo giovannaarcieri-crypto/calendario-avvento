@@ -269,38 +269,13 @@ body{
 
 /* ---------- mobile: si inquadra il villaggio ---------- */
 @media (max-width:700px) and (orientation:portrait){
-  /* tutto il villaggio nella larghezza dello schermo: si mostra solo la zona delle case (x 410–1700, y 0–925) */
-  .cornice{max-width:none;overflow:hidden;height:calc(100vw * 1920 / 1290 * 925 / 1920)}
-  .scena{width:calc(100vw * 1920 / 1290);margin-left:calc(100vw * -380 / 1290)}
-  .casella{width:6%}
-  /* tutto lo schermo è il villaggio: cielo sopra, neve sotto */
-  html,body{background:#191b43}
-  body{justify-content:flex-start;min-height:100svh}
-  .cielo{display:block;flex:1 1 0;min-height:24px;width:100%;
-    background:radial-gradient(1.5px 1.5px at 18% 30%,#fff9 50%,transparent 51%),radial-gradient(1.5px 1.5px at 72% 55%,#fff8 50%,transparent 51%),
-      radial-gradient(2px 2px at 45% 75%,#fffa 50%,transparent 51%),radial-gradient(1.5px 1.5px at 88% 20%,#fff7 50%,transparent 51%),#191b43}
-  .cornice{-webkit-mask-image:linear-gradient(#0000,#000 7%);mask-image:linear-gradient(#0000,#000 7%)}
-  .neve-giu{display:flex;flex-direction:column;align-items:center;flex:1.6 1 0;width:100%;position:relative;z-index:2;
-    margin-top:-34px;padding:34px 0 calc(16px + env(safe-area-inset-bottom));
-    background:linear-gradient(180deg,#323f6200 0,#323f62 34px,#2c3759 45%,#222a4c 100%)}
-  /* solo villaggio e download: icone e BONUS piccoli, appoggiati sulla neve */
-  .cielo{flex-grow:1.7}
-  .neve-giu{margin-top:-26px;padding-top:30px}
-  .neve-giu .barra{flex:none;padding:0 12px;gap:12px}
-  /* dal browser (c'è il download): solo villaggio e download. Nell'app installata: icone e BONUS sulla neve */
-  body.con-download .neve-giu .ico-btn,body.con-download .neve-giu .pill-bonus{display:none!important}
-  .neve-giu .ico-btn{width:50px;height:50px}
-  .neve-giu .pill-bonus{height:50px;font-size:16px;padding:0 20px;border-width:2px}
-  body{padding-bottom:0}
-  html{background:#222a4c}
-  .neve-giu .scarica{margin:8px auto 4px}
-  .neve-giu .barra{margin-top:6px}
-  .ruota{display:none!important}
-  body:not(.con-download) .neve-giu .ruota{display:flex!important;margin:2px auto 14px;padding:0;border:none;background:none;font-size:13px;color:#b3b9ee;opacity:.85;gap:6px}
-  body:not(.con-download) .neve-giu .ruota svg{width:20px;height:20px}
-  .icona,.bonus{display:none}
-  .solo-mobile{display:inline-block}
-  .ico-btn{display:inline-block}
+  /* telefono in verticale: identico al desktop (immagine intera con le sue icone e il BONUS) + "Ruota il telefono" */
+  .cornice{max-width:none}
+  .casella{width:6.5%}                                   /* area da toccare più grande del numero */
+  .icona::before{content:"";position:absolute;inset:-45%;border-radius:50%}
+  .bonus::before{content:"";position:absolute;inset:-60% -12%}
+  .ruota{display:flex;margin:16px auto 4px;padding:0;border:none;background:none;font-size:14px;color:#c9ceff;gap:8px}
+  .ruota svg{width:24px;height:24px}
 }
 @media (prefers-reduced-motion:reduce){
   .casella .bollino{transition:none}.fiocco,.casella.oggi .bollino,.sbuffo{animation:none}
@@ -308,19 +283,6 @@ body{
   .scena.luci-on .ghirlanda.a{animation:none;opacity:1}.scena.luci-on .ghirlanda.b{animation:none}
 }
 
-/* ---------- telefono: neve su tutto lo schermo e festone di lucine ---------- */
-body > .neve{position:fixed;inset:0;z-index:5;pointer-events:none}
-body > .neve .fiocco{top:-2%}
-.festone{display:none}
-@media (max-width:700px) and (orientation:portrait){
-  .festone{display:block;position:fixed;left:0;right:0;top:env(safe-area-inset-top);width:100%;height:auto;z-index:4;pointer-events:none;
-    opacity:0;transition:opacity .6s}
-  body.luci-on .festone{opacity:1}
-  .festone .filo{fill:none;stroke:#0b0f24;stroke-width:1.6;opacity:.9}
-  .festone .lamp{transition:fill .3s, filter .3s}
-  body.luci-on .festone .a{animation:lampA 1.6s infinite}
-  body.luci-on .festone .b{animation:lampB 1.6s infinite}
-}
 @keyframes lampA{0%,44%{fill:#ffe94f;filter:drop-shadow(0 0 5px #ffd84a)}50%,94%{fill:#5560ab;filter:none}100%{fill:#ffe94f;filter:drop-shadow(0 0 5px #ffd84a)}}
 @keyframes lampB{0%,44%{fill:#5560ab;filter:none}50%,94%{fill:#ffe94f;filter:drop-shadow(0 0 5px #ffd84a)}100%{fill:#5560ab;filter:none}}
 
@@ -345,7 +307,6 @@ body > .neve .fiocco{top:-2%}
 <body>
 
 <div class="cielo" aria-hidden="true"></div>
-<svg class="festone" id="festone" viewBox="0 0 390 70" aria-hidden="true"></svg>
 <div class="cornice">
   <div class="scena" id="scena">
     <img src="sfondo.jpg" alt="Villaggio innevato di notte con 24 casette numerate">
@@ -695,28 +656,7 @@ function toast(m){ const t = $('toast'); t.textContent = m; t.classList.add('vis
 
 disegna(); applica();
 
-// telefono in verticale: la neve cade su tutto lo schermo
-(function(){
-  const mq = matchMedia('(max-width:700px) and (orientation:portrait)');
-  const neve = $('neve'), casa = neve.parentNode, dopo = neve.nextSibling;
-  const sposta = () => { if (mq.matches) document.body.appendChild(neve); else casa.insertBefore(neve, dopo) };
-  sposta(); mq.addEventListener ? mq.addEventListener('change', sposta) : mq.addListener(sposta);
-})();
-// festone di lucine in cima allo schermo (visibile in verticale con le luci accese)
-(function(){
-  const svg = $('festone'); if (!svg) return;
-  let h = '';
-  [[0,8,130,8,58],[130,8,260,8,58],[260,8,390,8,58]].forEach(([x0,y0,x1,y1,c]) => {
-    const cx = (x0+x1)/2, cy = y0 + c;
-    h += `<path class="filo" d="M${x0} ${y0} Q${cx} ${cy} ${x1} ${y1}"/>`;
-    for (let i = 1; i < 8; i++){
-      const t = i/8, x = (1-t)*(1-t)*x0 + 2*(1-t)*t*cx + t*t*x1, y = (1-t)*(1-t)*y0 + 2*(1-t)*t*cy + t*t*y1;
-      h += `<rect x="${(x-1.6).toFixed(1)}" y="${(y-1).toFixed(1)}" width="3.2" height="3" rx=".6" fill="#0b0f24"/>`;
-      h += `<ellipse class="lamp ${i%2?'a':'b'}" cx="${x.toFixed(1)}" cy="${(y+5.5).toFixed(1)}" rx="3.6" ry="4.6" fill="#5560ab"/>`;
-    }
-  });
-  svg.innerHTML = h;
-})();
+
 
 
 
