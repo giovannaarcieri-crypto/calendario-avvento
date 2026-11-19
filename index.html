@@ -307,11 +307,45 @@ body{
   .finestre.oggi{animation:none;-webkit-mask-image:none;mask-image:none}.casella.oggi .bollino{opacity:1;transform:none}
   .scena.luci-on .ghirlanda.a{animation:none;opacity:1}.scena.luci-on .ghirlanda.b{animation:none}
 }
+
+/* ---------- telefono: neve su tutto lo schermo e festone di lucine ---------- */
+body > .neve{position:fixed;inset:0;z-index:5;pointer-events:none}
+body > .neve .fiocco{top:-2%}
+.festone{display:none}
+@media (max-width:700px) and (orientation:portrait){
+  .festone{display:block;position:fixed;left:0;right:0;top:env(safe-area-inset-top);width:100%;height:auto;z-index:4;pointer-events:none;
+    opacity:0;transition:opacity .6s}
+  body.luci-on .festone{opacity:1}
+  .festone .filo{fill:none;stroke:#0b0f24;stroke-width:1.6;opacity:.9}
+  .festone .lamp{transition:fill .3s, filter .3s}
+  body.luci-on .festone .a{animation:lampA 1.6s infinite}
+  body.luci-on .festone .b{animation:lampB 1.6s infinite}
+}
+@keyframes lampA{0%,44%{fill:#ffe94f;filter:drop-shadow(0 0 5px #ffd84a)}50%,94%{fill:#5560ab;filter:none}100%{fill:#ffe94f;filter:drop-shadow(0 0 5px #ffd84a)}}
+@keyframes lampB{0%,44%{fill:#5560ab;filter:none}50%,94%{fill:#ffe94f;filter:drop-shadow(0 0 5px #ffd84a)}100%{fill:#5560ab;filter:none}}
+
+/* ---------- telefono in orizzontale: riempie lo schermo (si sacrifica un po' di cielo in alto) ---------- */
+@media (orientation:landscape) and (max-height:500px){
+  body{justify-content:flex-start;padding-top:0}
+  .cornice{height:100svh;max-width:calc(100svh / .88 * 16 / 9)}
+  .scena{margin-top:calc(100svh - 100svh / .88)}
+}
+
+/* ---------- touch: niente effetto "passaggio del mouse" che resta attaccato ---------- */
+@media (hover:none){
+  .icona:not(.attiva):hover .ico{opacity:0}
+  .ico-btn:not(.attiva):hover .ico .fondo{fill:transparent}
+  .ico-btn:not(.attiva):hover .ico .barra{opacity:1}
+  .ico-btn:not(.attiva):hover .ico .anello{stroke:#c3c3f0}
+  .casella:hover::before{box-shadow:none;transform:none}
+  .casella.oggi:hover::before{box-shadow:none}
+}
 </style>
 </head>
 <body>
 
 <div class="cielo" aria-hidden="true"></div>
+<svg class="festone" id="festone" viewBox="0 0 390 70" aria-hidden="true"></svg>
 <div class="cornice">
   <div class="scena" id="scena">
     <img src="sfondo.jpg" alt="Villaggio innevato di notte con 24 casette numerate">
@@ -633,6 +667,7 @@ function applica(){
   $('neve').style.display = stato.neve ? '' : 'none';
   if (stato.neve && !$('neve').children.length) creaNeve();
   scena.classList.toggle('luci-on', stato.luci);
+  document.body.classList.toggle('luci-on', stato.luci);
   scena.classList.toggle('luna-on', stato.luna);
   document.querySelectorAll('[data-tipo]').forEach(b => {
     const on = !!stato[b.dataset.tipo];
@@ -659,6 +694,29 @@ let tT;
 function toast(m){ const t = $('toast'); t.textContent = m; t.classList.add('visibile'); clearTimeout(tT); tT = setTimeout(() => t.classList.remove('visibile'), 2300) }
 
 disegna(); applica();
+
+// telefono in verticale: la neve cade su tutto lo schermo
+(function(){
+  const mq = matchMedia('(max-width:700px) and (orientation:portrait)');
+  const neve = $('neve'), casa = neve.parentNode, dopo = neve.nextSibling;
+  const sposta = () => { if (mq.matches) document.body.appendChild(neve); else casa.insertBefore(neve, dopo) };
+  sposta(); mq.addEventListener ? mq.addEventListener('change', sposta) : mq.addListener(sposta);
+})();
+// festone di lucine in cima allo schermo (visibile in verticale con le luci accese)
+(function(){
+  const svg = $('festone'); if (!svg) return;
+  let h = '';
+  [[0,8,130,8,58],[130,8,260,8,58],[260,8,390,8,58]].forEach(([x0,y0,x1,y1,c]) => {
+    const cx = (x0+x1)/2, cy = y0 + c;
+    h += `<path class="filo" d="M${x0} ${y0} Q${cx} ${cy} ${x1} ${y1}"/>`;
+    for (let i = 1; i < 8; i++){
+      const t = i/8, x = (1-t)*(1-t)*x0 + 2*(1-t)*t*cx + t*t*x1, y = (1-t)*(1-t)*y0 + 2*(1-t)*t*cy + t*t*y1;
+      h += `<rect x="${(x-1.6).toFixed(1)}" y="${(y-1).toFixed(1)}" width="3.2" height="3" rx=".6" fill="#0b0f24"/>`;
+      h += `<ellipse class="lamp ${i%2?'a':'b'}" cx="${x.toFixed(1)}" cy="${(y+5.5).toFixed(1)}" rx="3.6" ry="4.6" fill="#5560ab"/>`;
+    }
+  });
+  svg.innerHTML = h;
+})();
 
 
 
