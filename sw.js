@@ -1,5 +1,5 @@
 // Funzionamento offline: salva tutti i file del calendario sul telefono
-const CACHE = 'avvento-v3';
+const CACHE = 'avvento-v4';
 const FILES = [
  "./",
  "apple-touch-icon.png",

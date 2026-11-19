@@ -266,7 +266,9 @@ body{
   /* il villaggio riempie lo schermo in altezza e si scorre di lato con il dito */
   .cornice{max-width:none;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain}
   .cornice::-webkit-scrollbar{display:none}
-  .scena{width:calc((100svh - 150px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 1920 / 1080);min-width:150vw}
+  /* altezza visibile; l'immagine è più alta del 17% e la striscia in basso (icone e BONUS disegnati) resta nascosta */
+  .cornice{--v:max(calc(100svh - 190px - env(safe-area-inset-top) - env(safe-area-inset-bottom)), 105vw);height:var(--v)}
+  .scena{width:calc(var(--v) / .855 * 1920 / 1080)}
   .casella{width:4.6%}
   .icona,.bonus{display:none}
   .solo-mobile{display:inline-block}
