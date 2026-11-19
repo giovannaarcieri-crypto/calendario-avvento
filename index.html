@@ -271,7 +271,7 @@ body{
 @media (max-width:700px) and (orientation:portrait){
   /* tutto il villaggio nella larghezza dello schermo: si mostra solo la zona delle case (x 410–1700, y 0–925) */
   .cornice{max-width:none;overflow:hidden;height:calc(100vw * 1920 / 1290 * 925 / 1920)}
-  .scena{width:calc(100vw * 1920 / 1290);margin-left:calc(100vw * -410 / 1290)}
+  .scena{width:calc(100vw * 1920 / 1290);margin-left:calc(100vw * -380 / 1290)}
   .casella{width:6%}
   /* tutto lo schermo è il villaggio: cielo sopra, neve sotto */
   html,body{background:#191b43}
@@ -284,13 +284,20 @@ body{
     margin-top:-34px;padding:34px 0 calc(16px + env(safe-area-inset-bottom));
     background:linear-gradient(180deg,#323f6200 0,#323f62 34px,#2c3759 45%,#222a4c 100%)}
   /* solo villaggio e download: icone e BONUS piccoli, appoggiati sulla neve */
-  .cielo{flex-grow:1.15}
+  .cielo{flex-grow:1.7}
   .neve-giu{margin-top:-26px;padding-top:30px}
   .neve-giu .barra{flex:none;padding:0 12px;gap:12px}
-  /* in verticale: niente icone né BONUS, solo villaggio e download (in orizzontale restano quelli dell'immagine) */
-  .neve-giu .ico-btn,.neve-giu .pill-bonus{display:none!important}
+  /* dal browser (c'è il download): solo villaggio e download. Nell'app installata: icone e BONUS sulla neve */
+  body.con-download .neve-giu .ico-btn,body.con-download .neve-giu .pill-bonus{display:none!important}
+  .neve-giu .ico-btn{width:50px;height:50px}
+  .neve-giu .pill-bonus{height:50px;font-size:16px;padding:0 20px;border-width:2px}
+  body{padding-bottom:0}
+  html{background:#222a4c}
   .neve-giu .scarica{margin:8px auto 4px}
+  .neve-giu .barra{margin-top:6px}
   .ruota{display:none!important}
+  body:not(.con-download) .neve-giu .ruota{display:flex!important;margin:2px auto 14px;padding:0;border:none;background:none;font-size:13px;color:#b3b9ee;opacity:.85;gap:6px}
+  body:not(.con-download) .neve-giu .ruota svg{width:20px;height:20px}
   .icona,.bonus{display:none}
   .solo-mobile{display:inline-block}
   .ico-btn{display:inline-block}
@@ -663,6 +670,7 @@ disegna(); applica();
   const iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const android = /Android/.test(ua);
   const btn = $('btnInstalla');
+  new MutationObserver(() => document.body.classList.toggle('con-download', !btn.hidden)).observe(btn, {attributes:true, attributeFilter:['hidden']});
   let richiesta = null;
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); richiesta = e; btn.hidden = false });
   window.addEventListener('appinstalled', () => { btn.hidden = true; toast('App installata! 🎄') });
