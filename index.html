@@ -763,7 +763,19 @@ disegna(); applica();
 
 // app installabile: memorizzazione offline (solo quando è pubblicata sul proprio sito)
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')){
-  try { navigator.serviceWorker.register('sw.js').catch(() => {}) } catch(e){}
+  try {
+    const giaControllata = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('sw.js', {updateViaCache: 'none'}).then(reg => {
+      reg.update();
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update() });
+    }).catch(() => {});
+    // è arrivata una versione nuova: ricarica una volta sola
+    let ricaricata = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (giaControllata && !ricaricata){ ricaricata = true; location.reload() }
+    });
+  } catch(e){}
+}) } catch(e){}
 }
 </script>
 </body>

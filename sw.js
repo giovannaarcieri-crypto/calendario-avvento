@@ -1,5 +1,5 @@
-// Funzionamento offline: salva tutti i file del calendario sul telefono
-const CACHE = 'avvento-v11';
+// Funzionamento offline + aggiornamenti sicuri
+const CACHE = 'avvento-v12';
 const FILES = [
  "./",
  "apple-touch-icon.png",
@@ -109,17 +109,30 @@ const FILES = [
  "sfondo.jpg"
 ];
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+  // 'reload' = scarica sempre dalla rete, mai dalla copia vecchia del browser
+  e.waitUntil(caches.open(CACHE)
+    .then(c => c.addAll(FILES.map(f => new Request(f, {cache: 'reload'}))))
+    .then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(k => Promise.all(k.filter(n => n !== CACHE).map(n => caches.delete(n)))).then(() => self.clients.claim()));
 });
 self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
-  // prima la copia salvata (veloce e offline), intanto si aggiorna dalla rete
+  const req = e.request;
+  if (req.method !== 'GET') return;
+  const pagina = req.mode === 'navigate' || req.destination === 'document' || /\.(html|js|webmanifest)$/.test(new URL(req.url).pathname) || new URL(req.url).pathname.endsWith('/');
+  if (pagina){
+    // pagina e codice: prima la rete (sempre aggiornati), la memoria solo se offline
+    e.respondWith(fetch(req, {cache: 'no-store'}).then(r => {
+      if (r && r.ok){ const copia = r.clone(); caches.open(CACHE).then(c => c.put(req, copia)) }
+      return r;
+    }).catch(() => caches.match(req, {ignoreSearch: true})));
+    return;
+  }
+  // immagini: prima la memoria (veloce), intanto si aggiornano dalla rete
   e.respondWith(caches.open(CACHE).then(async c => {
-    const salvato = await c.match(e.request, {ignoreSearch: true});
-    const rete = fetch(e.request).then(r => { if (r && r.ok) c.put(e.request, r.clone()); return r; }).catch(() => salvato);
+    const salvato = await c.match(req, {ignoreSearch: true});
+    const rete = fetch(req).then(r => { if (r && r.ok) c.put(req, r.clone()); return r; }).catch(() => salvato);
     return salvato || rete;
   }));
 });
